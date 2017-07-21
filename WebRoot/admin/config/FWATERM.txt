@@ -1,0 +1,1 @@
+{"isCheck1": "yes", "fcontent": "Ding-New", "fontSize": "20", "fontX": "1", "fontY": "1"}

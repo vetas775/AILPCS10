@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/aop 
+						http://www.springframework.org/schema/aop/spring-aop.xsd
+						http://www.springframework.org/schema/context 
+						http://www.springframework.org/schema/context/spring-context.xsd
+						http://www.springframework.org/schema/tx 
+						http://www.springframework.org/schema/tx/spring-tx.xsd
+	">
+<!--
+Apache Shiro 是一个强大而灵活的开源安全框架，它干净利落地处理身份认证，授权，企业会话管理和加密。
+Apache Shiro 的首要目标是易于使用和理解。安全有时候是很复杂的，甚至是痛苦的，但它没有必要这样。框架应该尽可能掩盖复杂的地方，露出一个干净而直观的 API，
+来简化开发人员在使他们的应用程序安全上的努力。
+以下是你可以用 Apache Shiro 所做的事情：
+    验证用户来核实他们的身份
+    对用户执行访问控制，如：
+    判断用户是否被分配了一个确定的安全角色。
+    判断用户是否被允许做某事。
+    在任何环境下使用 Session API，即使没有 Web 或 EJB 容器。
+    在身份验证，访问控制期间或在会话的生命周期，对事件作出反应。
+    聚集一个或多个用户安全数据的数据源，并作为一个单一的复合用户“视图”。
+    启用单点登录（SSO）功能。
+    并发登录管理（一个账号多人登录作踢人操作）。
+    为没有关联到登录的用户启用"Remember Me"服务。
+  …
+    以及更多——全部集成到紧密结合的易于使用的 API 中。
+
+目前Java领域主流的安全框架有SpringSecurity和Shiro，相比于SpringSecurity，Shiro轻量化，简单容易上手，且不局限于Java和Spring；
+SpringSecurity太笨重了，难以上手，且只能在Spring里用，所以博主极力推荐Shiro。
+
+spring集成shiro要用到shiro-all-1.2.4.jar
+jar包下载地址：http://download.csdn.net/detail/qq_33556185/9540257 
+ -->	
+	
+		<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+			<property name="realm" ref="ShiroRealm" />
+		</bean>
+		
+		<!-- 項目自定义的Realm -->
+	    <bean id="ShiroRealm" class="com.ailpcs.core.ShiroRealm" ></bean>
+		
+		<!-- Shiro Filter 拦截器相关配置-->
+		<bean id="ShiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+			<property name="securityManager" ref="securityManager" />
+			
+			<property name="loginUrl" value="/" />
+			
+			<property name="successUrl" value="/main/index" />
+			<!-- 用户访问无权限的链接时跳转此页面  -->
+			<property name="unauthorizedUrl" value="/fReeLogInJumpToLogin.do" />
+			<!-- 过滤链定义, 没有在这里设置为anno的未登录访问会直接被跳转到上面unauthorizedUrl里设置的URL, 去不到MyLoginHandlerInterceptor里 -->
+			<property name="filterChainDefinitions">
+				<value>
+				/static/login/** 			= anon <!-- anno代表不需要授权即可访问，对于静态资源，访问权限都设置为anno -->
+				/plugins/keypad/** 			= anon
+				/static/js/myjs/** 			= authc <!-- authc表示需要登录才可访问 -->
+				/static/js/** 				= anon
+				/uploadFiles/uploadImgs/** 	= anon
+				/fReeCatchSecCode.do     	= anon  <!-- 来自login.jsp里点击获取登录验证码的请求 -->
+	           	/fReeLogInUserLogin.do	    = anon  <!-- 用户请求登录 -->	           	
+	           	/app**/** 					= anon
+	           	/weixin/** 					= anon
+	           	/**							= authc
+	           	<!-- /userList = roles[admin]  要访问/userList需要有admin这个角色，如果没有此角色访问此URL会返回无授权页面-->
+                <!-- /userList = authc,perms[/userList] 要访问/userList需要有/userList的权限，要是没分配此权限访问此URL会返回无授权页面-->
+				</value>
+			</property>
+		</bean>
+   
+</beans>

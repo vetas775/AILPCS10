@@ -1,0 +1,1 @@
+{"SMSU2": "username", "SMSPAW2": "password"}

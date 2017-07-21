@@ -1,0 +1,593 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Invs6001Mapper">
+  <resultMap id="BaseResultMap" type="com.ailpcs.entity.Invs6001DO" > 
+    <id column="doc_id" property="docId" jdbcType="VARCHAR" />  <!--1. ID--> 
+	<result column="doc_type" property="docType" jdbcType="VARCHAR" />  <!--2. 分类-->   
+	<result column="doc_status" property="docStatus" jdbcType="VARCHAR" />  <!--3. 状态-->   
+	<result column="doc_flag" property="docFlag" jdbcType="VARCHAR" />  <!--4. 标记-->   
+	<result column="doc_class" property="docClass" jdbcType="VARCHAR" />  <!--5. 等级-->   
+	<result column="doc_title" property="docTitle" jdbcType="VARCHAR" />  <!--6. 标题-->   
+	<result column="title_pinyin" property="titlePinyin" jdbcType="VARCHAR" />  <!--7. 标题拼音-->   
+	<result column="doc_source" property="docSource" jdbcType="VARCHAR" />  <!--8. 来源-->   
+	<result column="source_pinyin" property="sourcePinyin" jdbcType="VARCHAR" />  <!--9. 来源拼音-->   
+	<result column="doc_author" property="docAuthor" jdbcType="VARCHAR" />  <!--10. 作者-->   
+	<result column="author_pinyin" property="authorPinyin" jdbcType="VARCHAR" />  <!--11. 作者拼音-->   
+	<result column="doc_incharge" property="docIncharge" jdbcType="VARCHAR" />  <!--12. 采编-->   
+	<result column="incharge_pinyin" property="inchargePinyin" jdbcType="VARCHAR" />  <!--13. 采编拼音-->   
+	<result column="index_key" property="indexKey" jdbcType="VARCHAR" />  <!--14. 关键词-->   
+	<result column="key_pinyin" property="keyPinyin" jdbcType="VARCHAR" />  <!--15. 关键词拼音-->   
+	<result column="index_key2" property="indexKey2" jdbcType="VARCHAR" />  <!--16. 关键词2-->   
+	<result column="key2_pinyin" property="key2Pinyin" jdbcType="VARCHAR" />  <!--17. 关键词2拼音-->   
+	<result column="doc_date" property="docDate" jdbcType="TIMESTAMP" />  <!--18. 发布日期-->   
+	<result column="effective_date_fm" property="effectiveDateFm" jdbcType="TIMESTAMP" />  <!--19. 有效期从-->   
+	<result column="effective_date_to" property="effectiveDateTo" jdbcType="TIMESTAMP" />  <!--20. 有效期至-->   
+	<result column="doc_description" property="docDescription" jdbcType="VARCHAR" />  <!--21. 摘要-->   
+	<result column="doc_content" property="docContent" jdbcType="VARCHAR" />  <!--22. 正文-->   
+	<result column="doc_url" property="docUrl" jdbcType="VARCHAR" />  <!--23. 文档URL-->   
+	<result column="pic_url" property="picUrl" jdbcType="VARCHAR" />  <!--24. 图片UrL-->   
+	<result column="pic_url2" property="picUrl2" jdbcType="VARCHAR" />  <!--25. 图片URL2-->   
+	<result column="orther_url" property="ortherUrl" jdbcType="OTHER" />  <!--26. JsonURL-->   
+	<result column="reader_like" property="readerLike" jdbcType="INTEGER" />  <!--27. 赞-->   
+	<result column="reader_deny" property="readerDeny" jdbcType="INTEGER" />  <!--28. 踩-->   
+	<result column="insert_user" property="insertUser" jdbcType="VARCHAR" />  <!--29. 建档人-->   
+	<result column="insert_date" property="insertDate" jdbcType="TIMESTAMP" />  <!--30. 建档日期-->   
+	<result column="update_user" property="updateUser" jdbcType="VARCHAR" />  <!--31. 修改人-->   
+	<result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />  <!--32. 修改日期-->   
+  </resultMap>
+  
+  <!-- Invs6001字段列表 (不含PK)-->
+  <sql id="BaseColumnListWithoutPK">
+    doc_type,	 
+    doc_status,	 
+    doc_flag,	 
+    doc_class,	 
+    doc_title,	 
+    title_pinyin,	 
+    doc_source,	 
+    source_pinyin,	 
+    doc_author,	 
+    author_pinyin,	 
+    doc_incharge,	 
+    incharge_pinyin,	 
+    index_key,	 
+    key_pinyin,	 
+    index_key2,	 
+    key2_pinyin,	 
+    doc_date,	 
+    effective_date_fm,	 
+    effective_date_to,	 
+    doc_description,	 
+    doc_content,	 
+    doc_url,	 
+    pic_url,	 
+    pic_url2,	 
+    orther_url,	 
+    reader_like,	 
+    reader_deny,	 
+    insert_user,	 
+    insert_date,	 
+    update_user,	 
+    update_date	
+  </sql> 
+  
+  <!--1 of 7 Invs6001分页列表 -->
+  <select id="listPage" parameterType="Page" resultMap="BaseResultMap">
+    select doc_id,<include refid="BaseColumnListWithoutPK"></include>
+	from invs6001
+	<where>
+      <if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
+	    <!--	根据需求自己加检索条件
+		字段1 LIKE "%"#{pd.keywords}${r"}"%"
+		or 
+		字段2 LIKE "%"#{pd.keywords}${r"}"%" 
+		-->
+	  </if>
+	  <choose>  <!-- 日期查询, 这里日期项按实际情况调整 -->
+	    <when test="pd.dateStyle != null and pd.dateStyle == 'insertDate'"> 
+	      <if test="pd.dateFm != null and pd.dateFm !=''"> 
+			and insert_date <![CDATA[>=]]> #{pd.dateFm} 
+	      </if>
+	      <if test="pd.dateTo != null and pd.dateTo !=''">
+		    and insert_date <![CDATA[<=]]> #{pd.dateTo}
+	      </if>
+	    </when> 
+	    <when test="pd.dateStyle != null and pd.dateStyle == 'updateDate'"> 
+	      <if test="pd.dateFm != null and pd.dateFm !=''"> 
+			and update_date <![CDATA[>=]]> #{pd.dateFm}
+	      </if>
+	      <if test="pd.dateTo != null and pd.dateTo !=''">
+		    and update_date <![CDATA[<=]]> #{pd.dateTo}
+	      </if>
+	    </when> 
+	    <otherwise>  
+        </otherwise>
+	  </choose>	 
+	</where>
+	<choose> <!-- 排序方式 -->	
+	  <when test="pd.orderBy != null and pd.orderBy == 'insertDate'"> 
+	    order by insert_date
+	  </when> 
+      <otherwise>  
+        order by update_date desc  <!-- 默认按updateDate倒序排列 -->	
+      </otherwise>
+	</choose>
+  </select>
+  
+  <sql id="Condition_list">
+    <where>
+      <if test="pd.keywords != null and pd.keywords != ''"><!-- 关键词检索 -->
+	    <!--	根据需求自己加检索条件
+		字段1 LIKE "%"#{pd.keywords}${r"}"%"
+		or 
+		字段2 LIKE "%"#{pd.keywords}${r"}"%" 
+		-->
+	  </if>	  
+	  <choose>  <!-- 日期查询, 这里日期项按实际情况调整 -->
+	    <when test="pd.dateField != null and pd.dateField == 'insertDate'"> 
+	      <if test="pd.dateFm != null and pd.dateFm !=''"> 
+			and insert_date <![CDATA[>=]]> #{pd.dateFm} 
+	      </if>
+	      <if test="pd.dateTo != null and pd.dateTo !=''">
+		    and insert_date <![CDATA[<=]]> #{pd.dateTo}
+	      </if>
+	    </when> 
+	    <when test="pd.dateField != null and pd.dateField == 'updateDate'"> 
+	      <if test="pd.dateFm != null and pd.dateFm !=''"> 
+			and update_date <![CDATA[>=]]> #{pd.dateFm}
+	      </if>
+	      <if test="pd.dateTo != null and pd.dateTo !=''">
+		    and update_date <![CDATA[<=]]> #{pd.dateTo}
+	      </if>
+	    </when> 
+	    <otherwise>  
+        </otherwise>
+	  </choose>	 
+	</where>
+  </sql>
+  <select id="selectPageList" parameterType="Page2" resultMap="BaseResultMap">
+    select doc_id, doc_status from invs6001
+	<include refid="Condition_list"/>
+	<if test="sort != null and sort != '' "> 
+	  <choose> 
+	    <when test="sort == 'docType' and order == 'asc'"> 
+ 		  order by doc_type ASC 			
+	    </when> 
+	    <when test="sort == 'docType' and order == 'desc'"> 
+ 		  order by doc_type desc 							
+	    </when> 
+	    <when test="sort == 'docStatus' and order == 'asc'"> 
+ 		  order by doc_status ASC 				
+	    </when> 
+	    <when test="sort == 'docStatus' and order == 'desc'"> 
+ 		  order by doc_status desc 					
+	    </when> 
+        <otherwise>  
+          order by update_date desc  
+        </otherwise>
+	  </choose>
+	</if>	
+	LIMIT #{start}, #{rows}  
+  </select>
+  <!-- 获取记录数 -->
+  <select id="countListTotal" parameterType="Page2" resultType="Integer">
+		select count(1) from invs6001 <include refid="Condition_list"/>
+  </select>
+  
+  <!--2 of 7 Invs6001列表(全部), 用于导出到Excel -->
+  <select id="listAll" parameterType="pd" resultType="pd">
+	select doc_id,<include refid="BaseColumnListWithoutPK"></include> from invs6001
+  </select>
+  
+  <!--Invs6001新增 -->
+  <!-- 视情况放开使用
+  <insert id="insert" parameterType="com.ailpcs.entity.Invs6001DO">
+    insert into invs6001(doc_id, <include refid="BaseColumnListWithoutPK"></include> ) 
+	<trim prefix=" values (" suffix=")" suffixOverrides="," >
+	  #{docId,jdbcType=VARCHAR},	
+	  #{docType,jdbcType=VARCHAR},	
+	  #{docStatus,jdbcType=VARCHAR},	
+	  #{docFlag,jdbcType=VARCHAR},	
+	  #{docClass,jdbcType=VARCHAR},	
+	  #{docTitle,jdbcType=VARCHAR},	
+	  #{titlePinyin,jdbcType=VARCHAR},	
+	  #{docSource,jdbcType=VARCHAR},	
+	  #{sourcePinyin,jdbcType=VARCHAR},	
+	  #{docAuthor,jdbcType=VARCHAR},	
+	  #{authorPinyin,jdbcType=VARCHAR},	
+	  #{docIncharge,jdbcType=VARCHAR},	
+	  #{inchargePinyin,jdbcType=VARCHAR},	
+	  #{indexKey,jdbcType=VARCHAR},	
+	  #{keyPinyin,jdbcType=VARCHAR},	
+	  #{indexKey2,jdbcType=VARCHAR},	
+	  #{key2Pinyin,jdbcType=VARCHAR},	
+	  #{docDate,jdbcType=TIMESTAMP},	
+	  #{effectiveDateFm,jdbcType=TIMESTAMP},	
+	  #{effectiveDateTo,jdbcType=TIMESTAMP},	
+	  #{docDescription,jdbcType=VARCHAR},	
+	  #{docContent,jdbcType=VARCHAR},	
+	  #{docUrl,jdbcType=VARCHAR},	
+	  #{picUrl,jdbcType=VARCHAR},	
+	  #{picUrl2,jdbcType=VARCHAR},	
+	  #{ortherUrl,jdbcType=VARCHAR},	
+	  #{readerLike,jdbcType=INTEGER},	
+	  #{readerDeny,jdbcType=INTEGER},	
+	  #{insertUser,jdbcType=VARCHAR},	
+	  #{insertDate,jdbcType=TIMESTAMP},	
+	  #{updateUser,jdbcType=VARCHAR},	
+	  #{updateDate,jdbcType=TIMESTAMP},	
+	</trim>
+  </insert>
+  -->
+  
+  <!--3 of 7 Invs6001新增 (值为''或null的字段不处理)-->
+  <insert id="insertSelective" parameterType="com.ailpcs.entity.Invs6001DO">
+    insert into invs6001
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="docId != null and docId != ''">
+	    doc_id,
+	  </if>
+      <if test="docType != null and docType != ''">
+	    doc_type,
+	  </if>
+      <if test="docStatus != null and docStatus != ''">
+	    doc_status,
+	  </if>
+      <if test="docFlag != null and docFlag != ''">
+	    doc_flag,
+	  </if>
+      <if test="docClass != null and docClass != ''">
+	    doc_class,
+	  </if>
+      <if test="docTitle != null and docTitle != ''">
+	    doc_title,
+	  </if>
+      <if test="titlePinyin != null and titlePinyin != ''">
+	    title_pinyin,
+	  </if>
+      <if test="docSource != null and docSource != ''">
+	    doc_source,
+	  </if>
+      <if test="sourcePinyin != null and sourcePinyin != ''">
+	    source_pinyin,
+	  </if>
+      <if test="docAuthor != null and docAuthor != ''">
+	    doc_author,
+	  </if>
+      <if test="authorPinyin != null and authorPinyin != ''">
+	    author_pinyin,
+	  </if>
+      <if test="docIncharge != null and docIncharge != ''">
+	    doc_incharge,
+	  </if>
+      <if test="inchargePinyin != null and inchargePinyin != ''">
+	    incharge_pinyin,
+	  </if>
+      <if test="indexKey != null and indexKey != ''">
+	    index_key,
+	  </if>
+      <if test="keyPinyin != null and keyPinyin != ''">
+	    key_pinyin,
+	  </if>
+      <if test="indexKey2 != null and indexKey2 != ''">
+	    index_key2,
+	  </if>
+      <if test="key2Pinyin != null and key2Pinyin != ''">
+	    key2_pinyin,
+	  </if>
+      <if test="docDate != null">
+	    doc_date,
+	  </if>
+      <if test="effectiveDateFm != null">
+	    effective_date_fm,
+	  </if>
+      <if test="effectiveDateTo != null">
+	    effective_date_to,
+	  </if>
+      <if test="docDescription != null and docDescription != ''">
+	    doc_description,
+	  </if>
+      <if test="docContent != null and docContent != ''">
+	    doc_content,
+	  </if>
+      <if test="docUrl != null and docUrl != ''">
+	    doc_url,
+	  </if>
+      <if test="picUrl != null and picUrl != ''">
+	    pic_url,
+	  </if>
+      <if test="picUrl2 != null and picUrl2 != ''">
+	    pic_url2,
+	  </if>
+      <if test="ortherUrl != null and ortherUrl != ''">
+	    orther_url,
+	  </if>
+      <if test="readerLike != null">
+	    reader_like,
+	  </if>
+      <if test="readerDeny != null">
+	    reader_deny,
+	  </if>
+      <if test="insertUser != null and insertUser != ''">
+	    insert_user,
+	  </if>
+      <if test="insertDate != null">
+	    insert_date,
+	  </if>
+      <if test="updateUser != null and updateUser != ''">
+	    update_user,
+	  </if>
+      <if test="updateDate != null">
+	    update_date,
+	  </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="docId != null and docId != ''">
+	    #{docId, jdbcType=VARCHAR},
+	  </if>
+      <if test="docType != null and docType != ''">
+	    #{docType, jdbcType=VARCHAR},
+	  </if>
+      <if test="docStatus != null and docStatus != ''">
+	    #{docStatus, jdbcType=VARCHAR},
+	  </if>
+      <if test="docFlag != null and docFlag != ''">
+	    #{docFlag, jdbcType=VARCHAR},
+	  </if>
+      <if test="docClass != null and docClass != ''">
+	    #{docClass, jdbcType=VARCHAR},
+	  </if>
+      <if test="docTitle != null and docTitle != ''">
+	    #{docTitle, jdbcType=VARCHAR},
+	  </if>
+      <if test="titlePinyin != null and titlePinyin != ''">
+	    #{titlePinyin, jdbcType=VARCHAR},
+	  </if>
+      <if test="docSource != null and docSource != ''">
+	    #{docSource, jdbcType=VARCHAR},
+	  </if>
+      <if test="sourcePinyin != null and sourcePinyin != ''">
+	    #{sourcePinyin, jdbcType=VARCHAR},
+	  </if>
+      <if test="docAuthor != null and docAuthor != ''">
+	    #{docAuthor, jdbcType=VARCHAR},
+	  </if>
+      <if test="authorPinyin != null and authorPinyin != ''">
+	    #{authorPinyin, jdbcType=VARCHAR},
+	  </if>
+      <if test="docIncharge != null and docIncharge != ''">
+	    #{docIncharge, jdbcType=VARCHAR},
+	  </if>
+      <if test="inchargePinyin != null and inchargePinyin != ''">
+	    #{inchargePinyin, jdbcType=VARCHAR},
+	  </if>
+      <if test="indexKey != null and indexKey != ''">
+	    #{indexKey, jdbcType=VARCHAR},
+	  </if>
+      <if test="keyPinyin != null and keyPinyin != ''">
+	    #{keyPinyin, jdbcType=VARCHAR},
+	  </if>
+      <if test="indexKey2 != null and indexKey2 != ''">
+	    #{indexKey2, jdbcType=VARCHAR},
+	  </if>
+      <if test="key2Pinyin != null and key2Pinyin != ''">
+	    #{key2Pinyin, jdbcType=VARCHAR},
+	  </if>
+      <if test="docDate != null">
+	    #{docDate, jdbcType=TIMESTAMP},
+	  </if>
+      <if test="effectiveDateFm != null">
+	    #{effectiveDateFm, jdbcType=TIMESTAMP},
+	  </if>
+      <if test="effectiveDateTo != null">
+	    #{effectiveDateTo, jdbcType=TIMESTAMP},
+	  </if>
+      <if test="docDescription != null and docDescription != ''">
+	    #{docDescription, jdbcType=VARCHAR},
+	  </if>
+      <if test="docContent != null and docContent != ''">
+	    #{docContent, jdbcType=VARCHAR},
+	  </if>
+      <if test="docUrl != null and docUrl != ''">
+	    #{docUrl, jdbcType=VARCHAR},
+	  </if>
+      <if test="picUrl != null and picUrl != ''">
+	    #{picUrl, jdbcType=VARCHAR},
+	  </if>
+      <if test="picUrl2 != null and picUrl2 != ''">
+	    #{picUrl2, jdbcType=VARCHAR},
+	  </if>
+      <if test="ortherUrl != null and ortherUrl != ''">
+	    #{ortherUrl, jdbcType=VARCHAR},
+	  </if>
+      <if test="readerLike != null">
+	    #{readerLike, jdbcType=INTEGER},
+	  </if>
+      <if test="readerDeny != null">
+	    #{readerDeny, jdbcType=INTEGER},
+	  </if>
+      <if test="insertUser != null and insertUser != ''">
+	    #{insertUser, jdbcType=VARCHAR},
+	  </if>
+      <if test="insertDate != null">
+	    #{insertDate, jdbcType=TIMESTAMP},
+	  </if>
+      <if test="updateUser != null and updateUser != ''">
+	    #{updateUser, jdbcType=VARCHAR},
+	  </if>
+      <if test="updateDate != null">
+	    #{updateDate, jdbcType=TIMESTAMP},
+	  </if>
+    </trim>
+  </insert>   
+  
+  <!--4 of 7 Invs6001按ID删除-->
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from invs6001 where doc_id = #{docId,jdbcType=VARCHAR}
+  </delete>
+  
+  <!-- Invs6001按ID修改 -->
+  <!-- 视情况放开使用
+  <update id="updateByPrimaryKey" parameterType="com.ailpcs.entity.Invs6001DO">
+    update invs6001 
+    <set> 
+	  doc_type = #{docType,jdbcType=VARCHAR},
+	  doc_status = #{docStatus,jdbcType=VARCHAR},
+	  doc_flag = #{docFlag,jdbcType=VARCHAR},
+	  doc_class = #{docClass,jdbcType=VARCHAR},
+	  doc_title = #{docTitle,jdbcType=VARCHAR},
+	  title_pinyin = #{titlePinyin,jdbcType=VARCHAR},
+	  doc_source = #{docSource,jdbcType=VARCHAR},
+	  source_pinyin = #{sourcePinyin,jdbcType=VARCHAR},
+	  doc_author = #{docAuthor,jdbcType=VARCHAR},
+	  author_pinyin = #{authorPinyin,jdbcType=VARCHAR},
+	  doc_incharge = #{docIncharge,jdbcType=VARCHAR},
+	  incharge_pinyin = #{inchargePinyin,jdbcType=VARCHAR},
+	  index_key = #{indexKey,jdbcType=VARCHAR},
+	  key_pinyin = #{keyPinyin,jdbcType=VARCHAR},
+	  index_key2 = #{indexKey2,jdbcType=VARCHAR},
+	  key2_pinyin = #{key2Pinyin,jdbcType=VARCHAR},
+	  doc_date = #{docDate,jdbcType=TIMESTAMP},
+	  effective_date_fm = #{effectiveDateFm,jdbcType=TIMESTAMP},
+	  effective_date_to = #{effectiveDateTo,jdbcType=TIMESTAMP},
+	  doc_description = #{docDescription,jdbcType=VARCHAR},
+	  doc_content = #{docContent,jdbcType=VARCHAR},
+	  doc_url = #{docUrl,jdbcType=VARCHAR},
+	  pic_url = #{picUrl,jdbcType=VARCHAR},
+	  pic_url2 = #{picUrl2,jdbcType=VARCHAR},
+	  orther_url = #{ortherUrl,jdbcType=VARCHAR},
+	  reader_like = #{readerLike,jdbcType=INTEGER},
+	  reader_deny = #{readerDeny,jdbcType=INTEGER},
+	  insert_user = #{insertUser,jdbcType=VARCHAR},
+	  insert_date = #{insertDate,jdbcType=TIMESTAMP},
+	  update_user = #{updateUser,jdbcType=VARCHAR},
+	  update_date = #{updateDate,jdbcType=TIMESTAMP},
+    </set>
+	where doc_id = #{docId,jdbcType=VARCHAR}
+  </update>
+  -->
+  
+  <!--5 of 7 Invs6001按ID修改(值为null的字段不处理) -->
+  <update id="updateByPrimaryKeySelective" parameterType="com.ailpcs.entity.Invs6001DO">
+    update invs6001 
+    <set> 
+      <if test="docType != null">
+	    doc_type = #{docType,jdbcType=VARCHAR},
+	  </if>
+      <if test="docStatus != null">
+	    doc_status = #{docStatus,jdbcType=VARCHAR},
+	  </if>
+      <if test="docFlag != null">
+	    doc_flag = #{docFlag,jdbcType=VARCHAR},
+	  </if>
+      <if test="docClass != null">
+	    doc_class = #{docClass,jdbcType=VARCHAR},
+	  </if>
+      <if test="docTitle != null">
+	    doc_title = #{docTitle,jdbcType=VARCHAR},
+	  </if>
+      <if test="titlePinyin != null">
+	    title_pinyin = #{titlePinyin,jdbcType=VARCHAR},
+	  </if>
+      <if test="docSource != null">
+	    doc_source = #{docSource,jdbcType=VARCHAR},
+	  </if>
+      <if test="sourcePinyin != null">
+	    source_pinyin = #{sourcePinyin,jdbcType=VARCHAR},
+	  </if>
+      <if test="docAuthor != null">
+	    doc_author = #{docAuthor,jdbcType=VARCHAR},
+	  </if>
+      <if test="authorPinyin != null">
+	    author_pinyin = #{authorPinyin,jdbcType=VARCHAR},
+	  </if>
+      <if test="docIncharge != null">
+	    doc_incharge = #{docIncharge,jdbcType=VARCHAR},
+	  </if>
+      <if test="inchargePinyin != null">
+	    incharge_pinyin = #{inchargePinyin,jdbcType=VARCHAR},
+	  </if>
+      <if test="indexKey != null">
+	    index_key = #{indexKey,jdbcType=VARCHAR},
+	  </if>
+      <if test="keyPinyin != null">
+	    key_pinyin = #{keyPinyin,jdbcType=VARCHAR},
+	  </if>
+      <if test="indexKey2 != null">
+	    index_key2 = #{indexKey2,jdbcType=VARCHAR},
+	  </if>
+      <if test="key2Pinyin != null">
+	    key2_pinyin = #{key2Pinyin,jdbcType=VARCHAR},
+	  </if>
+      <if test="docDate != null">
+	    doc_date = #{docDate,jdbcType=TIMESTAMP},
+	  </if>
+      <if test="effectiveDateFm != null">
+	    effective_date_fm = #{effectiveDateFm,jdbcType=TIMESTAMP},
+	  </if>
+      <if test="effectiveDateTo != null">
+	    effective_date_to = #{effectiveDateTo,jdbcType=TIMESTAMP},
+	  </if>
+      <if test="docDescription != null">
+	    doc_description = #{docDescription,jdbcType=VARCHAR},
+	  </if>
+      <if test="docContent != null">
+	    doc_content = #{docContent,jdbcType=VARCHAR},
+	  </if>
+      <if test="docUrl != null">
+	    doc_url = #{docUrl,jdbcType=VARCHAR},
+	  </if>
+      <if test="picUrl != null">
+	    pic_url = #{picUrl,jdbcType=VARCHAR},
+	  </if>
+      <if test="picUrl2 != null">
+	    pic_url2 = #{picUrl2,jdbcType=VARCHAR},
+	  </if>
+      <if test="ortherUrl != null">
+	    orther_url = #{ortherUrl,jdbcType=VARCHAR},
+	  </if>
+      <if test="readerLike != null">
+	    reader_like = #{readerLike,jdbcType=INTEGER},
+	  </if>
+      <if test="readerDeny != null">
+	    reader_deny = #{readerDeny,jdbcType=INTEGER},
+	  </if>
+      <if test="insertUser != null">
+	    insert_user = #{insertUser,jdbcType=VARCHAR},
+	  </if>
+      <if test="insertDate != null">
+	    insert_date = #{insertDate,jdbcType=TIMESTAMP},
+	  </if>
+      <if test="updateUser != null">
+	    update_user = #{updateUser,jdbcType=VARCHAR},
+	  </if>
+      <if test="updateDate != null">
+	    update_date = #{updateDate,jdbcType=TIMESTAMP},
+	  </if>
+      <if test = "docDateClearFlag != null and docDateClearFlag == 'Y'">  <!--清除日期, 视状况取舍-->
+        doc_date = NULL,
+      </if>  
+      <if test = "effectiveDateFmClearFlag != null and effectiveDateFmClearFlag == 'Y'">  <!--清除日期, 视状况取舍-->
+        effective_date_fm = NULL,
+      </if>  
+      <if test = "effectiveDateToClearFlag != null and effectiveDateToClearFlag == 'Y'">  <!--清除日期, 视状况取舍-->
+        effective_date_to = NULL,
+      </if>  
+    </set>
+	where doc_id = #{docId,jdbcType=VARCHAR}
+  </update>
+  
+  <!--6 of 7 Invs6001通过ID获取数据 -->
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select doc_id,<include refid="BaseColumnListWithoutPK"></include> from invs6001 
+	where doc_id = #{docId,jdbcType=VARCHAR}
+  </select> 
+ 
+  <!--7 of 7 Invs6001批量删除 -->
+  <delete id="deleteBatch">
+	delete from invs6001 where doc_id in
+	<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+      #{item}
+	</foreach>
+  </delete>	
+</mapper>

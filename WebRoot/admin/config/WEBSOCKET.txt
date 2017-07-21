@@ -1,0 +1,1 @@
+{"WIMIP": "127.0.0.1", "WIMPORT": "8887", "OLIP": "127.0.0.1", "OLPORT": "8889", "FHsmsSound": "2"}

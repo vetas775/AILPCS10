@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+  <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>
+			classpath:spring/ApplicationContext-main.xml,
+			classpath:spring/ApplicationContext-dataSource.xml,
+			classpath:spring/ApplicationContext-shiro.xml,
+			classpath:spring/ApplicationContext-redis.xml
+		</param-value>
+  </context-param>
+  <context-param>
+    <param-name>log4jConfigLocation</param-name>
+    <param-value>classpath:log4j.xml</param-value>
+  </context-param>
+  <!-- 项目使用spring框架时。当前台JSP页面和Java代码中使用了不同的字符集进行编码的时候就会出现表单提交的数据或者上传/下载中文名称文件出现乱码的问题，那就可以使用这个过滤器。 -->
+  <filter>
+    <filter-name>encodingFilter</filter-name>
+    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+    <init-param>
+      <param-name>encoding</param-name> <!--用来指定一个具体的字符集-->
+      <param-value>utf-8</param-value>
+    </init-param>
+    <init-param>
+        <param-name>forceEncoding</param-name> <!--true：无论request是否指定了字符集，都是用encoding；false：如果request已指定一个字符集，则不使用encoding-->
+        <param-value>false</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>encodingFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <context-param>
+    <param-name>webAppRootKey</param-name>
+    <param-value>web.ailpcs10.root</param-value>
+  </context-param>
+  <filter>
+    <filter-name>DruidWebStatFilter</filter-name>
+    <filter-class>com.alibaba.druid.support.http.WebStatFilter</filter-class>
+    <init-param>
+      <param-name>exclusions</param-name>
+      <param-value>*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>DruidWebStatFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
+  <!-- Druid内置监控界面使用配置, 完成这个配置后, 访问URL: druid/index.html 即可打开性能监控画面  -->
+  <servlet>
+    <servlet-name>DruidStatView</servlet-name>
+    <servlet-class>com.alibaba.druid.support.http.StatViewServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DruidStatView</servlet-name>
+    <url-pattern>/druid/*</url-pattern>
+  </servlet-mapping>
+  
+  <listener>
+    <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+  </listener>
+  <listener>
+    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+  <listener>
+    <listener-class>com.ailpcs.core.MyWebAppContextListener</listener-class> <!--我们利用它来获取WebApplicationContext -->
+  </listener>
+  <servlet>
+    <servlet-name>springMvc</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <init-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>classpath:spring/ApplicationContext-mvc.xml</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>springMvc</servlet-name>
+    <url-pattern>/</url-pattern>
+  </servlet-mapping>
+  <filter>
+    <filter-name>startFilter</filter-name>
+    <filter-class>com.ailpcs.core.MyStartFilter</filter-class>  
+    <!-- 初始化参数，在类MyStartFilter里引用此参数 -->
+    <!--Remark by Michael 17/06/25 init-param>
+        <param-name>disabletestfilter</param-name>
+        <param-value>N</param-value>
+    </init-param-->
+  </filter>
+  
+  <!-- 配置shiroFilter，所有请求都要先进shiro的代理类
+       DelegatingFilterProxy类是一个代理类，所有的请求都会首先发到这个filter代理
+                     然后再按照"filter-name"委派到spring中的这个bean。
+                     在Spring中配置的bean的name要和web.xml中的<filter-name>一样.
+	   targetFilterLifecycle，是否由spring来管理bean的生命周期，设置为true有个好处，可以调用spring后续的bean
+	-->
+  <filter>
+    <filter-name>ShiroFilter</filter-name>
+    <filter-class>
+			org.springframework.web.filter.DelegatingFilterProxy
+		</filter-class>
+    <init-param>
+      <param-name>targetFilterLifecycle</param-name>
+      <param-value>true</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>ShiroFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
+  <error-page>
+    <error-code>404</error-code>
+    <location>/404.jsp</location>
+  </error-page>
+  <session-config>
+    <session-timeout>600</session-timeout>
+  </session-config>
+</web-app>

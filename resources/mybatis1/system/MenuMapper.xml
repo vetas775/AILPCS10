@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MenuMapper">
+	<resultMap type="Menu" id="menuResultMap">
+		<id column="MENU_ID" property="menuId"/>
+		<result column="MENU_NAME" property="menuName"/>
+		<result column="MENU_URL" property="menuUrl"/>
+		<result column="PARENT_ID" property="parentId"/>
+		<result column="MENU_ORDER" property="menuOrder"/>
+		<result column="MENU_ICON" property="menuIcon"/>
+		<result column="MENU_TYPE" property="menuType"/>
+		<result column="MENU_STATE" property="menuState"/>
+		<!--result column="MENU_STYLE" property="menuStyle"/>
+		<result column="ACTIVE_STATUS" property="activeStatus"/-->
+	</resultMap>
+	
+	<!-- ztree -->
+	<resultMap type="Menu" id="menuZtreeResultMap">
+	<id column="MENU_ID" property="menuId"/>
+	<result column="MENU_NAME" property="menuName"/>
+	<result column="MENU_URL" property="menuUrl"/>
+	<result column="PARENT_ID" property="parentId"/>
+	<result column="MENU_ORDER" property="menuOrder"/>
+	<result column="MENU_ICON" property="menuIcon"/>
+	<result column="MENU_TYPE" property="menuType"/>
+	<result column="target" property="target"></result>
+	</resultMap>
+		
+	<!--通过ID获取其子一级菜单 -->
+	<select id="listSubMenuByParentId" parameterType="String" resultMap="menuResultMap">
+		select MENU_ID,MENU_NAME,MENU_URL,PARENT_ID,MENU_ORDER,MENU_ICON,MENU_TYPE,MENU_STATE <!-- ,MENU_STYLE,ACTIVE_STATUS  --> 
+		from sys_menu
+		where PARENT_ID = #{parentId} order by (MENU_ORDER+0) 
+	</select>
+	
+	<!--通过菜单ID获取数据 -->
+	<select id="getMenuById" parameterType="String" resultType="pd">
+		select MENU_ID as menuId, MENU_NAME as menuName, MENU_URL as menuUrl, PARENT_ID as parentId, MENU_ORDER as menuOrder,
+        MENU_ICON as menuIcon, MENU_TYPE as menuType, MENU_STATE as menuState
+        <!-- , MENU_STYLE as menuStyle, ACTIVE_STATUS as activeStatus  --> 
+	    from sys_menu
+		where MENU_ID=#{menuId}
+	</select>
+	
+	<!--新增 -->
+	<insert id="insertMenu" parameterType="Menu">
+		insert into sys_menu
+		(MENU_ID,MENU_NAME,MENU_URL,PARENT_ID,MENU_ORDER,MENU_ICON,MENU_TYPE,MENU_STATE)<!-- ,MENU_STYLE,ACTIVE_STATUS)-->
+		 values 
+		(#{menuId},	#{menuName}, #{menuUrl}, #{parentId}, #{menuOrder},	#{menuIcon}, #{menuType}, #{menuState})
+		 <!-- #{menuStyle},#{activeStatus})  -->
+	</insert>	
+		
+	<!--删除菜单-->
+	<delete id="deleteMenuById" parameterType="String">
+		delete from sys_menu where MENU_ID = #{menuId} 
+	</delete>
+	
+	<!--编辑菜单 -->
+	<update id="updateMenu" parameterType="Menu">
+		update sys_menu
+		set	MENU_NAME =#{menuName},
+			MENU_URL  =#{menuUrl} ,
+			MENU_ORDER=#{menuOrder},
+			MENU_STATE=#{menuState},
+			MENU_TYPE =#{menuType}
+		where MENU_ID=#{menuId}
+	</update>
+
+	<!--保存菜单图标  -->
+	<update id="editMenuIcon" parameterType="pd">
+		update sys_menu	set	MENU_ICON = #{menuIcon}
+		where MENU_ID=#{menuId}
+	</update>
+	
+	<!--取最大菜单ID-->
+	<select id="findMaxMenuId" resultType="pd">
+		select MAX(MENU_ID) as MID from sys_menu
+	</select>
+</mapper>
